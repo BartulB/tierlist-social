@@ -13,6 +13,9 @@
       --muted:#a9adbd;
       --border:#2a3044;
       --accent:#3b82f6;
+      --danger:#b91c1c;
+      --danger-bg:#2a1114;
+      --success:#16a34a;
       --gap:12px;
       --radius:12px;
     }
@@ -24,8 +27,13 @@
       color:var(--text);
     }
     header{
-      position:sticky; top:0; z-index:20;
-      display:flex; flex-wrap:wrap; gap:12px; align-items:center;
+      position:sticky;
+      top:0;
+      z-index:20;
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:center;
       padding:14px 16px;
       background:#0f1118ee;
       backdrop-filter: blur(8px);
@@ -51,7 +59,16 @@
     }
     button{cursor:pointer}
     button:hover{filter:brightness(1.08)}
-    textarea{width:100%; resize:vertical}
+    button:disabled{
+      opacity:.65;
+      cursor:not-allowed;
+      filter:none;
+    }
+    textarea{
+      width:100%;
+      resize:vertical;
+      min-height:90px;
+    }
     main{
       display:grid;
       grid-template-columns:280px 1fr;
@@ -74,9 +91,18 @@
       flex-wrap:wrap;
       margin-bottom:10px;
     }
-    .col{display:flex; flex-direction:column; gap:12px}
-    .muted{color:var(--muted); font-size:13px}
-    .hidden{display:none !important}
+    .col{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .muted{
+      color:var(--muted);
+      font-size:13px;
+    }
+    .hidden{
+      display:none !important;
+    }
     .grid{
       display:grid;
       grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
@@ -89,11 +115,40 @@
       padding:12px;
     }
     .avatar{
-      width:56px; height:56px;
+      width:56px;
+      height:56px;
       border-radius:50%;
       object-fit:cover;
       border:1px solid var(--border);
       background:#0b0e18;
+    }
+    .full{
+      width:100%;
+    }
+    .auth-wrap{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+    }
+    .auth-wrap input{
+      min-width:160px;
+    }
+    .error-box{
+      background:var(--danger-bg);
+      color:#fecaca;
+      border:1px solid #7f1d1d;
+      border-radius:12px;
+      padding:12px;
+      margin-bottom:14px;
+    }
+    .success-box{
+      background:#112418;
+      color:#bbf7d0;
+      border:1px solid #166534;
+      border-radius:12px;
+      padding:12px;
+      margin-bottom:14px;
     }
 
     /* Tier board */
@@ -103,11 +158,22 @@
       gap:12px;
       min-height:120px;
     }
-    .tierboard{display:flex; flex-direction:column; gap:12px}
-    .tier{display:flex; gap:12px; align-items:stretch}
+    .tierboard{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .tier{
+      display:flex;
+      gap:12px;
+      align-items:stretch;
+    }
     .tier-label{
-      width:64px; flex:0 0 64px;
-      display:flex; align-items:center; justify-content:center;
+      width:64px;
+      flex:0 0 64px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
       font-weight:700;
       border-radius:10px;
       border:1px solid var(--border);
@@ -124,7 +190,10 @@
       border-radius:12px;
       background:#121523;
     }
-    .lane.dragover{border-color:var(--accent); background:#10192f}
+    .lane.dragover{
+      border-color:var(--accent);
+      background:#10192f;
+    }
     .tile{
       width:90px;
       aspect-ratio:1/1;
@@ -134,6 +203,7 @@
       background:#0c0f19;
       cursor:grab;
       user-select:none;
+      touch-action:manipulation;
     }
     .tile img{
       width:100%;
@@ -141,10 +211,19 @@
       object-fit:cover;
       display:block;
     }
+    .tile.selected{
+      outline:3px solid var(--accent);
+      outline-offset:2px;
+    }
     @media (max-width:480px){
       .tile{width:106px}
+      .auth-wrap input{min-width:100%}
     }
-    a{color:#93c5fd; text-decoration:none}
+
+    a{
+      color:#93c5fd;
+      text-decoration:none;
+    }
     .comment{
       border-top:1px solid #23283b;
       padding-top:10px;
@@ -154,15 +233,29 @@
       padding:7px 10px;
       font-size:13px;
     }
+    .section-title{
+      margin-top:18px;
+      margin-bottom:8px;
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>Tier List Social</h1>
     <div class="spacer"></div>
-    <span id="userBadge" class="pill"></span>
-    <button id="signinBtn">Sign in</button>
-    <button id="signoutBtn" class="hidden">Sign out</button>
+
+    <div id="authLoggedOut" class="auth-wrap">
+      <input id="authEmail" type="email" placeholder="Email">
+      <input id="authPassword" type="password" placeholder="Password">
+      <button id="loginBtn">Log in</button>
+      <button id="signupBtn">Sign up</button>
+    </div>
+
+    <div id="authLoggedIn" class="auth-wrap hidden">
+      <span id="userBadge" class="pill"></span>
+      <button id="signoutBtn">Sign out</button>
+    </div>
+
     <span id="status" class="pill">Ready</span>
   </header>
 
@@ -178,16 +271,20 @@
       </div>
       <div style="height:12px"></div>
       <div class="muted">
-        Static app + Supabase backend.<br>
-        Your friends can use the same web link on desktop and mobile.
+        This app uses GitHub Pages for hosting and Supabase for login, storage, and saved data.
       </div>
     </aside>
 
     <section class="panel">
+      <div id="errorBox" class="error-box hidden"></div>
+      <div id="successBox" class="success-box hidden"></div>
+
       <div id="page-home" class="page">
         <h2>Welcome</h2>
         <p>Create public profiles, categories, tier lists, and comments.</p>
-        <div class="muted">Best on desktop, but also works on phones. A tap-to-place fallback is included for mobile.</div>
+        <div class="muted">
+          Mobile-friendly: you can drag tiles, or tap a tile and then tap a tier to place it.
+        </div>
       </div>
 
       <div id="page-make" class="page hidden">
@@ -197,7 +294,7 @@
           <button id="saveTierBtn">Save to My Profile</button>
         </div>
 
-        <h3>Category comments</h3>
+        <h3 class="section-title">Category comments</h3>
         <div class="row">
           <input id="newCatComment" placeholder="Write a public category comment" style="flex:1" />
           <button id="postCatComment">Post</button>
@@ -208,7 +305,7 @@
 
         <div class="row">
           <strong>Image Pool</strong>
-          <span class="muted">Drag images into a tier, or tap image then tap a tier on mobile.</span>
+          <span class="muted">Drag or tap image, then tap a tier on mobile.</span>
         </div>
         <div id="pool" class="pool"></div>
 
@@ -234,7 +331,7 @@
           </div>
         </div>
 
-        <h3>My Tier Lists</h3>
+        <h3 class="section-title">My Tier Lists</h3>
         <div id="myTierlists" class="grid"></div>
       </div>
 
@@ -295,14 +392,20 @@
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
     // =========================
-    // 1) PASTE YOUR KEYS HERE
+    // PASTE YOUR VALUES HERE
     // =========================
-    const SUPABASE_URL = "https://zmemxkkpuxhzqsgnjuqd.supabase.co";
-    const SUPABASE_ANON = "sb_publishable_68_yFzx78kGZS9BcZmZTcA_Ea3piP3M";
+    const SUPABASE_URL = "https://YOUR-PROJECT.supabase.co";
+    const SUPABASE_ANON = "YOUR-PUBLIC-OR-PUBLISHABLE-KEY";
 
-    const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    });
 
-    // Make magic link login reliable
+    // Exchange auth code from email confirmation redirects / magic link style redirects
     try {
       const { data } = await sb.auth.exchangeCodeForSession(window.location.href);
       if (data?.session) {
@@ -317,9 +420,18 @@
     // DOM
     // =========================
     const statusEl = document.getElementById("status");
+    const authLoggedOut = document.getElementById("authLoggedOut");
+    const authLoggedIn = document.getElementById("authLoggedIn");
     const userBadgeEl = document.getElementById("userBadge");
-    const signinBtn = document.getElementById("signinBtn");
+
+    const authEmail = document.getElementById("authEmail");
+    const authPassword = document.getElementById("authPassword");
+    const loginBtn = document.getElementById("loginBtn");
+    const signupBtn = document.getElementById("signupBtn");
     const signoutBtn = document.getElementById("signoutBtn");
+
+    const errorBox = document.getElementById("errorBox");
+    const successBox = document.getElementById("successBox");
 
     const pages = {
       home: document.getElementById("page-home"),
@@ -381,9 +493,32 @@
     // =========================
     // HELPERS
     // =========================
-    function setStatus(text, ms = 1500) {
+    function setStatus(text, ms = 1600) {
       statusEl.textContent = text;
-      if (ms) setTimeout(() => statusEl.textContent = "Ready", ms);
+      if (ms) {
+        setTimeout(() => {
+          statusEl.textContent = "Ready";
+        }, ms);
+      }
+    }
+
+    function showError(message) {
+      errorBox.textContent = message;
+      errorBox.classList.remove("hidden");
+    }
+
+    function clearError() {
+      errorBox.textContent = "";
+      errorBox.classList.add("hidden");
+    }
+
+    function showSuccess(message) {
+      successBox.textContent = message;
+      successBox.classList.remove("hidden");
+      setTimeout(() => {
+        successBox.classList.add("hidden");
+        successBox.textContent = "";
+      }, 3000);
     }
 
     function escapeHtml(s) {
@@ -401,6 +536,7 @@
     }
 
     function showPage(name) {
+      clearError();
       Object.values(pages).forEach(p => p.classList.add("hidden"));
       pages[name].classList.remove("hidden");
     }
@@ -411,6 +547,12 @@
 
     function profileFallbackName(profile, userId) {
       return profile?.username ? `@${profile.username}` : `user-${String(userId).slice(0, 6)}`;
+    }
+
+    function setButtonLoading(btn, loading, textWhenLoading = "Working...") {
+      if (!btn.dataset.originalText) btn.dataset.originalText = btn.textContent;
+      btn.disabled = loading;
+      btn.textContent = loading ? textWhenLoading : btn.dataset.originalText;
     }
 
     async function getProfilesMap(userIds) {
@@ -427,23 +569,38 @@
       if (!session?.user) return null;
       const user = session.user;
 
-      let { data: existing } = await sb.from("profiles").select("*").eq("id", user.id).maybeSingle();
+      let { data: existing } = await sb
+        .from("profiles")
+        .select("*")
+        .eq("id", user.id)
+        .maybeSingle();
 
       if (!existing) {
-        const emailName = user.email?.split("@")[0] || `user-${user.id.slice(0, 6)}`;
-        const { data: created, error } = await sb.from("profiles").upsert({
-          id: user.id,
-          username: emailName,
-          bio: "",
-          avatar_url: null
-        }).select().single();
+        const metaUsername =
+          user.user_metadata?.username ||
+          user.email?.split("@")[0] ||
+          `user-${user.id.slice(0, 6)}`;
+
+        const { data: created, error } = await sb
+          .from("profiles")
+          .upsert({
+            id: user.id,
+            username: metaUsername,
+            bio: "",
+            avatar_url: null
+          })
+          .select()
+          .single();
 
         if (error) {
           console.error(error);
+          showError(error.message);
           return null;
         }
+
         existing = created;
       }
+
       return existing;
     }
 
@@ -451,11 +608,13 @@
     // AUTH
     // =========================
     async function refreshAuthUI() {
+      clearError();
+
       const { data } = await sb.auth.getSession();
       session = data.session || null;
 
-      signinBtn.classList.toggle("hidden", !!session);
-      signoutBtn.classList.toggle("hidden", !session);
+      authLoggedOut.classList.toggle("hidden", !!session);
+      authLoggedIn.classList.toggle("hidden", !session);
 
       if (session?.user) {
         me = await ensureOwnProfile();
@@ -472,26 +631,88 @@
       }
     }
 
-    signinBtn.addEventListener("click", async () => {
-      const email = prompt("Enter your email:");
-      if (!email) return;
-      const { error } = await sb.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: window.location.origin + window.location.pathname
+    loginBtn.addEventListener("click", async () => {
+      clearError();
+      setButtonLoading(loginBtn, true, "Logging in...");
+
+      try {
+        const email = authEmail.value.trim();
+        const password = authPassword.value.trim();
+
+        if (!email || !password) {
+          showError("Enter email and password.");
+          return;
         }
-      });
-      if (error) {
-        alert(error.message);
-      } else {
-        alert("Magic link sent. Open it in the same browser.");
+
+        const { error } = await sb.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) {
+          showError(error.message);
+          return;
+        }
+
+        showSuccess("Logged in successfully.");
+        setStatus("Logged in");
+        await refreshAuthUI();
+        await loadMyTierlists();
+      } finally {
+        setButtonLoading(loginBtn, false);
+      }
+    });
+
+    signupBtn.addEventListener("click", async () => {
+      clearError();
+      setButtonLoading(signupBtn, true, "Signing up...");
+
+      try {
+        const email = authEmail.value.trim();
+        const password = authPassword.value.trim();
+
+        if (!email || !password) {
+          showError("Enter email and password.");
+          return;
+        }
+
+        if (password.length < 6) {
+          showError("Password should be at least 6 characters.");
+          return;
+        }
+
+        const username = prompt("Choose a username:");
+        if (!username) {
+          showError("Signup cancelled. Username is required.");
+          return;
+        }
+
+        const { error } = await sb.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: window.location.origin + window.location.pathname,
+            data: { username: username.trim() }
+          }
+        });
+
+        if (error) {
+          showError(error.message);
+          return;
+        }
+
+        showSuccess("Signup successful. Check your email and confirm your account, then log in.");
+      } finally {
+        setButtonLoading(signupBtn, false);
       }
     });
 
     signoutBtn.addEventListener("click", async () => {
+      clearError();
       await sb.auth.signOut();
       await refreshAuthUI();
       setStatus("Signed out");
+      showSuccess("Signed out.");
     });
 
     sb.auth.onAuthStateChange(async () => {
@@ -502,6 +723,11 @@
     // =========================
     // TIER BOARD
     // =========================
+    function clearTileSelection() {
+      document.querySelectorAll(".tile.selected").forEach(tile => tile.classList.remove("selected"));
+      selectedTile = null;
+    }
+
     function makeTile(src) {
       const div = document.createElement("div");
       div.className = "tile";
@@ -519,13 +745,14 @@
 
       div.addEventListener("click", () => {
         if (selectedTile === div) {
-          div.style.outline = "";
+          div.classList.remove("selected");
           selectedTile = null;
           return;
         }
-        if (selectedTile) selectedTile.style.outline = "";
+
+        clearTileSelection();
         selectedTile = div;
-        div.style.outline = "2px solid #3b82f6";
+        div.classList.add("selected");
       });
 
       return div;
@@ -569,8 +796,7 @@
         const tile = document.querySelector(`.tile[data-id="${CSS.escape(id)}"]`);
         if (tile) {
           lane.appendChild(tile);
-          tile.style.outline = "";
-          selectedTile = null;
+          clearTileSelection();
           saveDraft();
         }
       });
@@ -579,8 +805,7 @@
       lane.addEventListener("click", () => {
         if (!selectedTile) return;
         lane.appendChild(selectedTile);
-        selectedTile.style.outline = "";
-        selectedTile = null;
+        clearTileSelection();
         saveDraft();
       });
 
@@ -599,8 +824,7 @@
         if (e.target.closest(".tile")) return;
         if (!selectedTile) return;
         poolEl.appendChild(selectedTile);
-        selectedTile.style.outline = "";
-        selectedTile = null;
+        clearTileSelection();
         saveDraft();
       };
 
@@ -614,8 +838,7 @@
         const tile = document.querySelector(`.tile[data-id="${CSS.escape(id)}"]`);
         if (tile) {
           poolEl.appendChild(tile);
-          tile.style.outline = "";
-          selectedTile = null;
+          clearTileSelection();
           saveDraft();
         }
       });
@@ -628,6 +851,7 @@
         tiers[tier] = Array.from(lane.querySelectorAll(".tile")).map(t => t.dataset.id);
       }
       const pool = Array.from(poolEl.querySelectorAll(".tile")).map(t => t.dataset.id);
+
       return {
         category_id: currentCategory?.id,
         tiers,
@@ -678,6 +902,7 @@
 
       if (error) {
         console.error(error);
+        showError(error.message);
         return;
       }
 
@@ -724,6 +949,7 @@
 
       if (error) {
         console.error(error);
+        showError(error.message);
         return [];
       }
 
@@ -733,10 +959,12 @@
     }
 
     async function setCategory(categoryId) {
+      clearError();
       currentCategory = categories.find(c => c.id === categoryId) || null;
       if (!currentCategory) return;
 
       catSelect.value = categoryId;
+      uploadCategorySelect.value = categoryId;
 
       const urls = await getCategoryImageUrls(categoryId);
       renderBoard(urls);
@@ -750,7 +978,10 @@
 
     async function loadUsers() {
       const { data, error } = await sb.from("profiles").select("*").order("created_at", { ascending: false });
-      if (error) return;
+      if (error) {
+        showError(error.message);
+        return;
+      }
 
       usersGrid.innerHTML = "";
 
@@ -775,10 +1006,17 @@
     }
 
     async function openUserProfile(userId) {
-      const [{ data: profile }, { data: tierlists }] = await Promise.all([
+      clearError();
+
+      const [{ data: profile, error: pErr }, { data: tierlists, error: tErr }] = await Promise.all([
         sb.from("profiles").select("*").eq("id", userId).maybeSingle(),
         sb.from("tierlists").select("*").eq("user_id", userId).order("created_at", { ascending: false })
       ]);
+
+      if (pErr || tErr) {
+        showError(pErr?.message || tErr?.message || "Could not load profile.");
+        return;
+      }
 
       userProfileBox.innerHTML = `
         <div class="row">
@@ -822,7 +1060,10 @@
         .eq("user_id", session.user.id)
         .order("created_at", { ascending: false });
 
-      if (error) return;
+      if (error) {
+        showError(error.message);
+        return;
+      }
 
       myTierlistsEl.innerHTML = "";
 
@@ -852,7 +1093,10 @@
         .eq("category_id", categoryId)
         .order("created_at", { ascending: true });
 
-      if (error) return;
+      if (error) {
+        showError(error.message);
+        return;
+      }
 
       const profilesMap = await getProfilesMap((data || []).map(x => x.user_id));
       catCommentsEl.innerHTML = "";
@@ -876,25 +1120,39 @@
     }
 
     postCatComment.addEventListener("click", async () => {
-      if (!session?.user) return alert("Sign in first.");
-      if (!currentCategory) return;
+      clearError();
+      setButtonLoading(postCatComment, true, "Posting...");
 
-      const content = newCatComment.value.trim();
-      if (!content) return;
+      try {
+        if (!session?.user) {
+          showError("You need to log in first.");
+          return;
+        }
+        if (!currentCategory) return;
 
-      const { error } = await sb.from("category_comments").insert({
-        category_id: currentCategory.id,
-        user_id: session.user.id,
-        content
-      });
+        const content = newCatComment.value.trim();
+        if (!content) {
+          showError("Write a comment first.");
+          return;
+        }
 
-      if (error) {
-        alert(error.message);
-        return;
+        const { error } = await sb.from("category_comments").insert({
+          category_id: currentCategory.id,
+          user_id: session.user.id,
+          content
+        });
+
+        if (error) {
+          showError(error.message);
+          return;
+        }
+
+        newCatComment.value = "";
+        await loadCategoryComments(currentCategory.id);
+        showSuccess("Comment posted.");
+      } finally {
+        setButtonLoading(postCatComment, false);
       }
-
-      newCatComment.value = "";
-      await loadCategoryComments(currentCategory.id);
     });
 
     async function loadTierlistComments(tierlistId) {
@@ -904,7 +1162,10 @@
         .eq("tierlist_id", tierlistId)
         .order("created_at", { ascending: true });
 
-      if (error) return;
+      if (error) {
+        showError(error.message);
+        return;
+      }
 
       const profilesMap = await getProfilesMap((data || []).map(x => x.user_id));
       tlCommentsEl.innerHTML = "";
@@ -928,57 +1189,86 @@
     }
 
     postTLComment.addEventListener("click", async () => {
-      if (!session?.user) return alert("Sign in first.");
-      if (!activeTierlistId) return;
+      clearError();
+      setButtonLoading(postTLComment, true, "Posting...");
 
-      const content = newTLComment.value.trim();
-      if (!content) return;
+      try {
+        if (!session?.user) {
+          showError("You need to log in first.");
+          return;
+        }
+        if (!activeTierlistId) return;
 
-      const { error } = await sb.from("tierlist_comments").insert({
-        tierlist_id: activeTierlistId,
-        user_id: session.user.id,
-        content
-      });
+        const content = newTLComment.value.trim();
+        if (!content) {
+          showError("Write a comment first.");
+          return;
+        }
 
-      if (error) {
-        alert(error.message);
-        return;
+        const { error } = await sb.from("tierlist_comments").insert({
+          tierlist_id: activeTierlistId,
+          user_id: session.user.id,
+          content
+        });
+
+        if (error) {
+          showError(error.message);
+          return;
+        }
+
+        newTLComment.value = "";
+        await loadTierlistComments(activeTierlistId);
+        showSuccess("Comment posted.");
+      } finally {
+        setButtonLoading(postTLComment, false);
       }
-
-      newTLComment.value = "";
-      await loadTierlistComments(activeTierlistId);
     });
 
     // =========================
     // SAVE TIERLIST
     // =========================
     saveTierBtn.addEventListener("click", async () => {
-      if (!session?.user) return alert("Sign in first.");
-      if (!currentCategory) return;
+      clearError();
+      setButtonLoading(saveTierBtn, true, "Saving...");
 
-      const name = prompt("Tier list name (optional):") || "";
+      try {
+        if (!session?.user) {
+          showError("You need to log in first.");
+          return;
+        }
+        if (!currentCategory) return;
 
-      const { error } = await sb.from("tierlists").insert({
-        user_id: session.user.id,
-        category_id: currentCategory.id,
-        name,
-        placements: getPlacements()
-      });
+        const name = prompt("Tier list name (optional):") || "";
 
-      if (error) {
-        alert(error.message);
-        return;
+        const { error } = await sb.from("tierlists").insert({
+          user_id: session.user.id,
+          category_id: currentCategory.id,
+          name,
+          placements: getPlacements()
+        });
+
+        if (error) {
+          showError(error.message);
+          return;
+        }
+
+        setStatus("Tier list saved");
+        showSuccess("Tier list saved to your profile.");
+        await loadMyTierlists();
+      } finally {
+        setButtonLoading(saveTierBtn, false);
       }
-
-      setStatus("Tier list saved");
-      await loadMyTierlists();
     });
 
     async function openTierlist(tierlistId) {
+      clearError();
       activeTierlistId = tierlistId;
 
       const { data: tl, error } = await sb.from("tierlists").select("*").eq("id", tierlistId).single();
-      if (error || !tl) return;
+      if (error || !tl) {
+        showError(error?.message || "Could not load tier list.");
+        return;
+      }
 
       const [profileRes, catRes] = await Promise.all([
         sb.from("profiles").select("*").eq("id", tl.user_id).maybeSingle(),
@@ -1019,42 +1309,53 @@
     // PROFILE
     // =========================
     saveProfileBtn.addEventListener("click", async () => {
-      if (!session?.user) return alert("Sign in first.");
+      clearError();
+      setButtonLoading(saveProfileBtn, true, "Saving...");
 
-      const updates = {
-        id: session.user.id,
-        username: usernameInput.value.trim() || null,
-        bio: bioInput.value.trim() || null
-      };
-
-      if (avatarFileInput.files[0]) {
-        const file = avatarFileInput.files[0];
-        const ext = file.name.split(".").pop();
-        const path = `${session.user.id}/avatar.${ext}`;
-
-        const { error: uploadError } = await sb.storage
-          .from("avatars")
-          .upload(path, file, { upsert: true });
-
-        if (uploadError) {
-          alert(uploadError.message);
+      try {
+        if (!session?.user) {
+          showError("You need to log in first.");
           return;
         }
 
-        updates.avatar_url = sb.storage.from("avatars").getPublicUrl(path).data.publicUrl;
+        const updates = {
+          id: session.user.id,
+          username: usernameInput.value.trim() || null,
+          bio: bioInput.value.trim() || null
+        };
+
+        if (avatarFileInput.files[0]) {
+          const file = avatarFileInput.files[0];
+          const ext = file.name.split(".").pop();
+          const path = `${session.user.id}/avatar.${ext}`;
+
+          const { error: uploadError } = await sb.storage
+            .from("avatars")
+            .upload(path, file, { upsert: true });
+
+          if (uploadError) {
+            showError(uploadError.message);
+            return;
+          }
+
+          updates.avatar_url = sb.storage.from("avatars").getPublicUrl(path).data.publicUrl;
+        }
+
+        const { error } = await sb.from("profiles").upsert(updates);
+
+        if (error) {
+          showError(error.message);
+          return;
+        }
+
+        me = await ensureOwnProfile();
+        await refreshAuthUI();
+        await loadUsers();
+        showSuccess("Profile saved.");
+        setStatus("Profile saved");
+      } finally {
+        setButtonLoading(saveProfileBtn, false);
       }
-
-      const { error } = await sb.from("profiles").upsert(updates);
-
-      if (error) {
-        alert(error.message);
-        return;
-      }
-
-      me = await ensureOwnProfile();
-      await refreshAuthUI();
-      await loadUsers();
-      setStatus("Profile saved");
     });
 
     // =========================
@@ -1067,40 +1368,61 @@
     });
 
     createCategoryBtn.addEventListener("click", async () => {
-      if (!session?.user) return alert("Sign in first.");
+      clearError();
+      setButtonLoading(createCategoryBtn, true, "Creating...");
 
-      const name = newCatName.value.trim();
-      const slug = (newCatSlug.value.trim() || slugify(name));
-      const is_public = newCatPublic.value === "true";
+      try {
+        if (!session?.user) {
+          showError("You need to log in first.");
+          return;
+        }
 
-      if (!name || !slug) {
-        alert("Please enter name and slug.");
-        return;
+        const name = newCatName.value.trim();
+        const slug = (newCatSlug.value.trim() || slugify(name));
+        const is_public = newCatPublic.value === "true";
+
+        if (!name || !slug) {
+          showError("Please enter both category name and slug.");
+          return;
+        }
+
+        const { error } = await sb.from("categories").insert({
+          owner_id: session.user.id,
+          name,
+          slug,
+          is_public
+        });
+
+        if (error) {
+          showError(error.message);
+          return;
+        }
+
+        newCatName.value = "";
+        newCatSlug.value = "";
+        await loadCategories();
+        showSuccess("Category created.");
+        setStatus("Category created");
+      } finally {
+        setButtonLoading(createCategoryBtn, false);
       }
-
-      const { error } = await sb.from("categories").insert({
-        owner_id: session.user.id,
-        name,
-        slug,
-        is_public
-      });
-
-      if (error) {
-        alert(error.message);
-        return;
-      }
-
-      newCatName.value = "";
-      newCatSlug.value = "";
-      await loadCategories();
-      setStatus("Category created");
     });
 
     catImagesInput.addEventListener("change", async () => {
-      if (!session?.user) return alert("Sign in first.");
+      clearError();
+
+      if (!session?.user) {
+        showError("You need to log in first.");
+        return;
+      }
 
       const categoryId = uploadCategorySelect.value;
-      if (!categoryId) return alert("Pick a category first.");
+      if (!categoryId) {
+        showError("Pick a category first.");
+        return;
+      }
+
+      if (!catImagesInput.files.length) return;
 
       uploadResults.innerHTML = "";
 
@@ -1117,7 +1439,9 @@
       if (currentCategory?.id === categoryId) {
         await setCategory(categoryId);
       }
+      showSuccess("Upload complete.");
       setStatus("Upload complete");
+      catImagesInput.value = "";
     });
 
     // =========================
@@ -1128,22 +1452,29 @@
         const key = btn.getAttribute("data-page");
 
         if (key === "home") showPage("home");
+
         if (key === "make") {
           showPage("make");
-          if (categories.length && !currentCategory) await setCategory(categories[0].id);
+          if (categories.length && !currentCategory) {
+            await setCategory(categories[0].id);
+          }
         }
+
         if (key === "my-profile") {
           showPage("myProfile");
           await loadMyTierlists();
         }
+
         if (key === "users") {
           showPage("users");
           await loadUsers();
         }
+
         if (key === "categories") {
           showPage("categories");
           await loadCategories();
         }
+
         if (key === "new-category") {
           showPage("newCategory");
           await loadCategories();
