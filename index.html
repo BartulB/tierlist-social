@@ -350,6 +350,8 @@
       <div id="page-categories" class="page hidden">
         <h2>Categories</h2>
         <div id="catsGrid" class="grid"></div>
+        <div style="height:14px"></div>
+        <div id="categoryDetailsBox" class="hidden"></div>
       </div>
 
       <div id="page-new-category" class="page hidden">
@@ -432,6 +434,8 @@
 
     const errorBox = document.getElementById("errorBox");
     const successBox = document.getElementById("successBox");
+
+    const categoryDetailsBox = document.getElementById("categoryDetailsBox");
 
     const pages = {
       home: document.getElementById("page-home"),
@@ -728,19 +732,20 @@
       selectedTile = null;
     }
 
-    function makeTile(src) {
+    function makeTile(imageObj) {
       const div = document.createElement("div");
       div.className = "tile";
       div.draggable = true;
-      div.dataset.id = src;
+      div.dataset.id = imageObj.publicUrl;
+      div.dataset.path = imageObj.path;
 
       const img = document.createElement("img");
-      img.src = src;
-      img.alt = "tile";
+      img.src = imageObj.publicUrl;
+      img.alt = imageObj.name || "tile";
       div.appendChild(img);
 
       div.addEventListener("dragstart", (e) => {
-        e.dataTransfer.setData("text/plain", src);
+        e.dataTransfer.setData("text/plain", imageObj.publicUrl);
       });
 
       div.addEventListener("click", () => {
@@ -813,12 +818,12 @@
       return row;
     }
 
-    function renderBoard(imageUrls) {
+    function renderBoard(images) {
       tierboardEl.innerHTML = "";
       poolEl.innerHTML = "";
 
       TIERS.forEach(t => tierboardEl.appendChild(makeLane(t)));
-      imageUrls.forEach(url => poolEl.appendChild(makeTile(url)));
+      images.forEach(image => poolEl.appendChild(makeTile(image)));
 
       poolEl.onclick = (e) => {
         if (e.target.closest(".tile")) return;
@@ -929,10 +934,10 @@
           <strong><a href="#">${escapeHtml(c.name)}</a></strong>
           <div class="muted">${escapeHtml(c.slug)}</div>
         `;
-        card.querySelector("a").addEventListener("click", (e) => {
+        card.querySelector("a").addEventListener("click", async (e) => {
           e.preventDefault();
-          showPage("make");
-          setCategory(c.id);
+          showPage("categories");
+          await openCategoryDetails(c.id);
         });
         catsGrid.appendChild(card);
       }
@@ -942,7 +947,7 @@
       }
     }
 
-    async function getCategoryImageUrls(categoryId) {
+    async function getCategoryImages(categoryId) {
       const { data: files, error } = await sb.storage
         .from("category-images")
         .list(categoryId, { limit: 200 });
@@ -955,7 +960,11 @@
 
       return (files || [])
         .filter(f => f.name)
-        .map(f => sb.storage.from("category-images").getPublicUrl(`${categoryId}/${f.name}`).data.publicUrl);
+        .map(f => ({
+          name: f.name,
+          path: `${categoryId}/${f.name}`,
+          publicUrl: sb.storage.from("category-images").getPublicUrl(`${categoryId}/${f.name}`).data.publicUrl
+        }));
     }
 
     async function setCategory(categoryId) {
@@ -966,8 +975,8 @@
       catSelect.value = categoryId;
       uploadCategorySelect.value = categoryId;
 
-      const urls = await getCategoryImageUrls(categoryId);
-      renderBoard(urls);
+      const images = await getCategoryImages(categoryId);
+      renderBoard(images);
       loadDraft();
       await loadCategoryComments(categoryId);
     }
@@ -1443,6 +1452,149 @@
       setStatus("Upload complete");
       catImagesInput.value = "";
     });
+
+    // =========================
+    // CATEGORY MANAGEMENT
+    // =========================
+    function isCurrentUserCategoryOwner() {
+      return !!(session?.user && currentCategory && currentCategory.owner_id === session.user.id);
+    }
+
+    async function deleteCategoryImage(filePath) {
+      clearError();
+
+      const confirmed = confirm("Are you sure you want to delete this image?");
+      if (!confirmed) return;
+
+      const { error } = await sb.storage
+        .from("category-images")
+        .remove([filePath]);
+
+      if (error) {
+        showError(error.message);
+        return;
+      }
+
+      showSuccess("Image deleted.");
+      if (currentCategory) {
+        await setCategory(currentCategory.id);
+      }
+    }
+
+    async function deleteCategory(categoryId) {
+      clearError();
+
+      const confirmed = confirm("Are you sure you want to delete this entire category?");
+      if (!confirmed) return;
+
+      const { data: files, error: listError } = await sb.storage
+        .from("category-images")
+        .list(categoryId, { limit: 200 });
+
+      if (listError) {
+        showError(listError.message);
+        return;
+      }
+
+      if (files && files.length) {
+        const paths = files.map(f => `${categoryId}/${f.name}`);
+        const { error: removeError } = await sb.storage
+          .from("category-images")
+          .remove(paths);
+
+        if (removeError) {
+          showError(removeError.message);
+          return;
+        }
+      }
+
+      const { error: deleteError } = await sb
+        .from("categories")
+        .delete()
+        .eq("id", categoryId);
+
+      if (deleteError) {
+        showError(deleteError.message);
+        return;
+      }
+
+      showSuccess("Category deleted.");
+      currentCategory = null;
+      categoryDetailsBox.classList.add("hidden");
+      categoryDetailsBox.innerHTML = "";
+      await loadCategories();
+      showPage("categories");
+    }
+
+    async function openCategoryDetails(categoryId) {
+      clearError();
+
+      const category = categories.find(c => c.id === categoryId);
+      if (!category) return;
+
+      const images = await getCategoryImages(categoryId);
+      const isOwner = !!(session?.user && category.owner_id === session.user.id);
+
+      categoryDetailsBox.classList.remove("hidden");
+      categoryDetailsBox.innerHTML = `
+        <div class="card">
+          <div class="row" style="justify-content:space-between;">
+            <div>
+              <h3>${escapeHtml(category.name)}</h3>
+              <div class="muted">${escapeHtml(category.slug)}</div>
+            </div>
+            <div class="row">
+              <button id="openCategoryForTierBtn">Make Tier List</button>
+              ${isOwner ? `<button id="deleteCategoryBtn" style="background:#7f1d1d;">Delete Category</button>` : ""}
+            </div>
+          </div>
+
+          <div class="muted" style="margin:10px 0 14px;">
+            ${isOwner
+              ? "You own this category. You can delete images or delete the whole category."
+              : "You can use this category to create a tier list."}
+          </div>
+
+          <div id="categoryImageManager" class="grid"></div>
+        </div>
+      `;
+
+      document.getElementById("openCategoryForTierBtn").addEventListener("click", async () => {
+        showPage("make");
+        await setCategory(categoryId);
+      });
+
+      if (isOwner) {
+        document.getElementById("deleteCategoryBtn").addEventListener("click", () => {
+          deleteCategory(categoryId);
+        });
+      }
+
+      const categoryImageManager = document.getElementById("categoryImageManager");
+
+      if (!images.length) {
+        categoryImageManager.innerHTML = `<div class="muted">No uploaded images yet.</div>`;
+        return;
+      }
+
+      images.forEach(image => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <img src="${image.publicUrl}" style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:10px; margin-bottom:10px;">
+          <div class="muted" style="word-break:break-word; margin-bottom:10px;">${escapeHtml(image.name)}</div>
+          ${isOwner ? `<button style="background:#7f1d1d;">Delete Image</button>` : ""}
+        `;
+
+        if (isOwner) {
+          card.querySelector("button").addEventListener("click", () => {
+            deleteCategoryImage(image.path);
+          });
+        }
+
+        categoryImageManager.appendChild(card);
+      });
+    }
 
     // =========================
     // NAV
