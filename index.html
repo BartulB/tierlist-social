@@ -19,17 +19,20 @@
       --gap:12px;
       --radius:12px;
     }
+
     *{box-sizing:border-box}
+
     body{
       margin:0;
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       background:var(--bg);
       color:var(--text);
     }
+
     header{
       position:sticky;
       top:0;
-      z-index:20;
+      z-index:50;
       display:flex;
       flex-wrap:wrap;
       gap:12px;
@@ -39,8 +42,10 @@
       backdrop-filter: blur(8px);
       border-bottom:1px solid #232837;
     }
+
     h1,h2,h3{margin:0 0 10px}
     .spacer{flex:1}
+
     .pill{
       padding:4px 10px;
       border:1px solid var(--border);
@@ -49,6 +54,7 @@
       font-size:12px;
       background:#121528;
     }
+
     button,input,textarea,select{
       background:#222635;
       color:var(--text);
@@ -57,6 +63,7 @@
       padding:10px 12px;
       font-size:14px;
     }
+
     button{cursor:pointer}
     button:hover{filter:brightness(1.08)}
     button:disabled{
@@ -64,26 +71,31 @@
       cursor:not-allowed;
       filter:none;
     }
+
     textarea{
       width:100%;
       resize:vertical;
       min-height:90px;
     }
+
     main{
       display:grid;
       grid-template-columns:280px 1fr;
       gap:12px;
       padding:16px;
     }
+
     @media (max-width: 980px){
       main{grid-template-columns:1fr}
     }
+
     .panel{
       background:var(--panel);
       border:1px solid #22273a;
       border-radius:var(--radius);
       padding:12px;
     }
+
     .row{
       display:flex;
       gap:12px;
@@ -91,29 +103,33 @@
       flex-wrap:wrap;
       margin-bottom:10px;
     }
+
     .col{
       display:flex;
       flex-direction:column;
       gap:12px;
     }
+
     .muted{
       color:var(--muted);
       font-size:13px;
     }
-    .hidden{
-      display:none !important;
-    }
+
+    .hidden{display:none !important}
+
     .grid{
       display:grid;
       grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
       gap:12px;
     }
+
     .card{
       background:var(--panel2);
       border:1px solid #23283b;
       border-radius:12px;
       padding:12px;
     }
+
     .avatar{
       width:56px;
       height:56px;
@@ -122,18 +138,14 @@
       border:1px solid var(--border);
       background:#0b0e18;
     }
-    .full{
-      width:100%;
-    }
+
     .auth-wrap{
       display:flex;
-      flex-wrap:wrap;
       gap:8px;
       align-items:center;
+      flex-wrap:wrap;
     }
-    .auth-wrap input{
-      min-width:160px;
-    }
+
     .error-box{
       background:var(--danger-bg);
       color:#fecaca;
@@ -142,6 +154,7 @@
       padding:12px;
       margin-bottom:14px;
     }
+
     .success-box{
       background:#112418;
       color:#bbf7d0;
@@ -151,23 +164,37 @@
       margin-bottom:14px;
     }
 
-    /* Tier board */
+    .small-btn{
+      padding:7px 10px;
+      font-size:13px;
+    }
+
+    .danger-btn{
+      background:#7f1d1d;
+    }
+
+    .full{width:100%}
+    .section-title{margin-top:18px;margin-bottom:8px}
+
     .pool{
       display:grid;
       grid-template-columns:repeat(auto-fill,minmax(90px,1fr));
       gap:12px;
       min-height:120px;
     }
+
     .tierboard{
       display:flex;
       flex-direction:column;
       gap:12px;
     }
+
     .tier{
       display:flex;
       gap:12px;
       align-items:stretch;
     }
+
     .tier-label{
       width:64px;
       flex:0 0 64px;
@@ -179,6 +206,7 @@
       border:1px solid var(--border);
       background:#0f1322;
     }
+
     .lane{
       min-height:92px;
       flex:1;
@@ -190,10 +218,12 @@
       border-radius:12px;
       background:#121523;
     }
+
     .lane.dragover{
       border-color:var(--accent);
       background:#10192f;
     }
+
     .tile{
       width:90px;
       aspect-ratio:1/1;
@@ -205,37 +235,45 @@
       user-select:none;
       touch-action:manipulation;
     }
+
     .tile img{
       width:100%;
       height:100%;
       object-fit:cover;
       display:block;
     }
+
     .tile.selected{
       outline:3px solid var(--accent);
       outline-offset:2px;
     }
+
+    .thumb{
+      width:100%;
+      aspect-ratio:1/1;
+      object-fit:cover;
+      border-radius:10px;
+      border:1px solid var(--border);
+      margin-bottom:10px;
+      display:block;
+      background:#0b0e18;
+    }
+
+    .auth-floating{
+      position:absolute;
+      top:70px;
+      right:16px;
+      width:min(360px, calc(100vw - 32px));
+      z-index:60;
+    }
+
     @media (max-width:480px){
       .tile{width:106px}
-      .auth-wrap input{min-width:100%}
     }
 
     a{
       color:#93c5fd;
       text-decoration:none;
-    }
-    .comment{
-      border-top:1px solid #23283b;
-      padding-top:10px;
-      margin-top:10px;
-    }
-    .small-btn{
-      padding:7px 10px;
-      font-size:13px;
-    }
-    .section-title{
-      margin-top:18px;
-      margin-bottom:8px;
     }
   </style>
 </head>
@@ -244,11 +282,9 @@
     <h1>Tier List Social</h1>
     <div class="spacer"></div>
 
-    <div id="authLoggedOut" class="auth-wrap">
-      <input id="authEmail" type="email" placeholder="Email">
-      <input id="authPassword" type="password" placeholder="Password">
-      <button id="loginBtn">Log in</button>
-      <button id="signupBtn">Sign up</button>
+    <div id="authClosed" class="auth-wrap">
+      <button id="openLoginBtn">Log in</button>
+      <button id="openSignupBtn">Sign up</button>
     </div>
 
     <div id="authLoggedIn" class="auth-wrap hidden">
@@ -258,6 +294,24 @@
 
     <span id="status" class="pill">Ready</span>
   </header>
+
+  <div id="authPanel" class="panel auth-floating hidden">
+    <div class="row" style="justify-content:space-between;">
+      <strong id="authTitle">Log in</strong>
+      <button id="closeAuthPanelBtn" class="small-btn">✕</button>
+    </div>
+
+    <div class="col">
+      <input id="authEmail" type="email" placeholder="Email">
+      <input id="authPassword" type="password" placeholder="Password">
+      <input id="authUsername" type="text" placeholder="Username" class="hidden">
+
+      <button id="loginBtn">Log in</button>
+      <button id="signupBtn" class="hidden">Create account</button>
+
+      <div id="authHint" class="muted">Use your email and password.</div>
+    </div>
+  </div>
 
   <main>
     <aside class="panel">
@@ -269,9 +323,11 @@
         <button data-page="categories">🗂️ Categories</button>
         <button data-page="new-category">➕ New Category</button>
       </div>
+
       <div style="height:12px"></div>
       <div class="muted">
-        This app uses GitHub Pages for hosting and Supabase for login, storage, and saved data.
+        Use Categories to browse/manage categories.<br>
+        Use Make Tier List only to rank items.
       </div>
     </aside>
 
@@ -283,7 +339,7 @@
         <h2>Welcome</h2>
         <p>Create public profiles, categories, tier lists, and comments.</p>
         <div class="muted">
-          Mobile-friendly: you can drag tiles, or tap a tile and then tap a tier to place it.
+          Mobile-friendly: tap an image, then tap a tier to place it.
         </div>
       </div>
 
@@ -393,9 +449,6 @@
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    // =========================
-    // PASTE YOUR VALUES HERE
-    // =========================
     const SUPABASE_URL = "https://zmemxkkpuxhzqsgnjuqd.supabase.co";
     const SUPABASE_ANON = "sb_publishable_68_yFzx78kGZS9BcZmZTcA_Ea3piP3M";
 
@@ -407,7 +460,6 @@
       }
     });
 
-    // Exchange auth code from email confirmation redirects / magic link style redirects
     try {
       const { data } = await sb.auth.exchangeCodeForSession(window.location.href);
       if (data?.session) {
@@ -418,24 +470,25 @@
       }
     } catch (_) {}
 
-    // =========================
-    // DOM
-    // =========================
     const statusEl = document.getElementById("status");
-    const authLoggedOut = document.getElementById("authLoggedOut");
-    const authLoggedIn = document.getElementById("authLoggedIn");
-    const userBadgeEl = document.getElementById("userBadge");
-
-    const authEmail = document.getElementById("authEmail");
-    const authPassword = document.getElementById("authPassword");
-    const loginBtn = document.getElementById("loginBtn");
-    const signupBtn = document.getElementById("signupBtn");
-    const signoutBtn = document.getElementById("signoutBtn");
-
     const errorBox = document.getElementById("errorBox");
     const successBox = document.getElementById("successBox");
 
-    const categoryDetailsBox = document.getElementById("categoryDetailsBox");
+    const authClosed = document.getElementById("authClosed");
+    const authLoggedIn = document.getElementById("authLoggedIn");
+    const authPanel = document.getElementById("authPanel");
+    const authTitle = document.getElementById("authTitle");
+    const authHint = document.getElementById("authHint");
+    const openLoginBtn = document.getElementById("openLoginBtn");
+    const openSignupBtn = document.getElementById("openSignupBtn");
+    const closeAuthPanelBtn = document.getElementById("closeAuthPanelBtn");
+    const authEmail = document.getElementById("authEmail");
+    const authPassword = document.getElementById("authPassword");
+    const authUsername = document.getElementById("authUsername");
+    const loginBtn = document.getElementById("loginBtn");
+    const signupBtn = document.getElementById("signupBtn");
+    const signoutBtn = document.getElementById("signoutBtn");
+    const userBadgeEl = document.getElementById("userBadge");
 
     const pages = {
       home: document.getElementById("page-home"),
@@ -466,6 +519,7 @@
 
     const usersGrid = document.getElementById("usersGrid");
     const catsGrid = document.getElementById("catsGrid");
+    const categoryDetailsBox = document.getElementById("categoryDetailsBox");
 
     const newCatName = document.getElementById("newCatName");
     const newCatSlug = document.getElementById("newCatSlug");
@@ -483,9 +537,6 @@
     const postTLComment = document.getElementById("postTLComment");
     const tlCommentsEl = document.getElementById("tlComments");
 
-    // =========================
-    // STATE
-    // =========================
     const TIERS = ["S","A","B","C","D","F"];
     let session = null;
     let me = null;
@@ -494,15 +545,10 @@
     let selectedTile = null;
     let activeTierlistId = null;
 
-    // =========================
-    // HELPERS
-    // =========================
     function setStatus(text, ms = 1600) {
       statusEl.textContent = text;
       if (ms) {
-        setTimeout(() => {
-          statusEl.textContent = "Ready";
-        }, ms);
+        setTimeout(() => statusEl.textContent = "Ready", ms);
       }
     }
 
@@ -522,7 +568,7 @@
       setTimeout(() => {
         successBox.classList.add("hidden");
         successBox.textContent = "";
-      }, 3000);
+      }, 2800);
     }
 
     function escapeHtml(s) {
@@ -571,24 +617,23 @@
 
     async function ensureOwnProfile() {
       if (!session?.user) return null;
-      const user = session.user;
 
       let { data: existing } = await sb
         .from("profiles")
         .select("*")
-        .eq("id", user.id)
+        .eq("id", session.user.id)
         .maybeSingle();
 
       if (!existing) {
         const metaUsername =
-          user.user_metadata?.username ||
-          user.email?.split("@")[0] ||
-          `user-${user.id.slice(0, 6)}`;
+          session.user.user_metadata?.username ||
+          session.user.email?.split("@")[0] ||
+          `user-${session.user.id.slice(0, 6)}`;
 
         const { data: created, error } = await sb
           .from("profiles")
           .upsert({
-            id: user.id,
+            id: session.user.id,
             username: metaUsername,
             bio: "",
             avatar_url: null
@@ -597,7 +642,6 @@
           .single();
 
         if (error) {
-          console.error(error);
           showError(error.message);
           return null;
         }
@@ -608,17 +652,41 @@
       return existing;
     }
 
-    // =========================
-    // AUTH
-    // =========================
+    function openAuthPanel(mode) {
+      clearError();
+      authPanel.classList.remove("hidden");
+
+      if (mode === "login") {
+        authTitle.textContent = "Log in";
+        authHint.textContent = "Enter your email and password.";
+        authUsername.classList.add("hidden");
+        loginBtn.classList.remove("hidden");
+        signupBtn.classList.add("hidden");
+      } else {
+        authTitle.textContent = "Sign up";
+        authHint.textContent = "Create a new account.";
+        authUsername.classList.remove("hidden");
+        loginBtn.classList.add("hidden");
+        signupBtn.classList.remove("hidden");
+      }
+    }
+
+    function closeAuthPanel() {
+      authPanel.classList.add("hidden");
+      authEmail.value = "";
+      authPassword.value = "";
+      authUsername.value = "";
+    }
+
     async function refreshAuthUI() {
       clearError();
 
       const { data } = await sb.auth.getSession();
       session = data.session || null;
 
-      authLoggedOut.classList.toggle("hidden", !!session);
+      authClosed.classList.toggle("hidden", !!session);
       authLoggedIn.classList.toggle("hidden", !session);
+      authPanel.classList.add("hidden");
 
       if (session?.user) {
         me = await ensureOwnProfile();
@@ -635,6 +703,10 @@
       }
     }
 
+    openLoginBtn.addEventListener("click", () => openAuthPanel("login"));
+    openSignupBtn.addEventListener("click", () => openAuthPanel("signup"));
+    closeAuthPanelBtn.addEventListener("click", closeAuthPanel);
+
     loginBtn.addEventListener("click", async () => {
       clearError();
       setButtonLoading(loginBtn, true, "Logging in...");
@@ -648,20 +720,19 @@
           return;
         }
 
-        const { error } = await sb.auth.signInWithPassword({
-          email,
-          password
-        });
+        const { error } = await sb.auth.signInWithPassword({ email, password });
 
         if (error) {
           showError(error.message);
           return;
         }
 
+        closeAuthPanel();
         showSuccess("Logged in successfully.");
-        setStatus("Logged in");
         await refreshAuthUI();
         await loadMyTierlists();
+      } catch (err) {
+        showError(err?.message || "Login failed.");
       } finally {
         setButtonLoading(loginBtn, false);
       }
@@ -669,14 +740,15 @@
 
     signupBtn.addEventListener("click", async () => {
       clearError();
-      setButtonLoading(signupBtn, true, "Signing up...");
+      setButtonLoading(signupBtn, true, "Creating...");
 
       try {
         const email = authEmail.value.trim();
         const password = authPassword.value.trim();
+        const username = authUsername.value.trim();
 
-        if (!email || !password) {
-          showError("Enter email and password.");
+        if (!email || !password || !username) {
+          showError("Enter email, password, and username.");
           return;
         }
 
@@ -685,18 +757,12 @@
           return;
         }
 
-        const username = prompt("Choose a username:");
-        if (!username) {
-          showError("Signup cancelled. Username is required.");
-          return;
-        }
-
         const { error } = await sb.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: window.location.origin + window.location.pathname,
-            data: { username: username.trim() }
+            data: { username }
           }
         });
 
@@ -705,17 +771,18 @@
           return;
         }
 
-        showSuccess("Signup successful. Check your email and confirm your account, then log in.");
+        closeAuthPanel();
+        showSuccess("Signup successful. Check your email to confirm your account.");
+      } catch (err) {
+        showError(err?.message || "Signup failed.");
       } finally {
         setButtonLoading(signupBtn, false);
       }
     });
 
     signoutBtn.addEventListener("click", async () => {
-      clearError();
       await sb.auth.signOut();
       await refreshAuthUI();
-      setStatus("Signed out");
       showSuccess("Signed out.");
     });
 
@@ -724,9 +791,6 @@
       await loadMyTierlists();
     });
 
-    // =========================
-    // TIER BOARD
-    // =========================
     function clearTileSelection() {
       document.querySelectorAll(".tile.selected").forEach(tile => tile.classList.remove("selected"));
       selectedTile = null;
@@ -754,7 +818,6 @@
           selectedTile = null;
           return;
         }
-
         clearTileSelection();
         selectedTile = div;
         div.classList.add("selected");
@@ -806,7 +869,6 @@
         }
       });
 
-      // Mobile tap-to-place
       lane.addEventListener("click", () => {
         if (!selectedTile) return;
         lane.appendChild(selectedTile);
@@ -833,9 +895,7 @@
         saveDraft();
       };
 
-      poolEl.addEventListener("dragover", (e) => {
-        e.preventDefault();
-      });
+      poolEl.addEventListener("dragover", (e) => e.preventDefault());
 
       poolEl.addEventListener("drop", (e) => {
         e.preventDefault();
@@ -856,12 +916,7 @@
         tiers[tier] = Array.from(lane.querySelectorAll(".tile")).map(t => t.dataset.id);
       }
       const pool = Array.from(poolEl.querySelectorAll(".tile")).map(t => t.dataset.id);
-
-      return {
-        category_id: currentCategory?.id,
-        tiers,
-        pool
-      };
+      return { category_id: currentCategory?.id, tiers, pool };
     }
 
     function applyPlacements(placements) {
@@ -891,14 +946,28 @@
       if (!currentCategory) return;
       const raw = localStorage.getItem(storageKey(currentCategory.id));
       if (!raw) return;
-      try {
-        applyPlacements(JSON.parse(raw));
-      } catch {}
+      try { applyPlacements(JSON.parse(raw)); } catch {}
     }
 
-    // =========================
-    // DATA LOAD
-    // =========================
+    async function getCategoryImages(categoryId) {
+      const { data: files, error } = await sb.storage
+        .from("category-images")
+        .list(categoryId, { limit: 200 });
+
+      if (error) {
+        showError(error.message);
+        return [];
+      }
+
+      return (files || [])
+        .filter(f => f.name)
+        .map(f => ({
+          name: f.name,
+          path: `${categoryId}/${f.name}`,
+          publicUrl: sb.storage.from("category-images").getPublicUrl(`${categoryId}/${f.name}`).data.publicUrl
+        }));
+    }
+
     async function loadCategories() {
       const { data, error } = await sb
         .from("categories")
@@ -906,7 +975,6 @@
         .order("created_at", { ascending: false });
 
       if (error) {
-        console.error(error);
         showError(error.message);
         return;
       }
@@ -945,26 +1013,6 @@
       if (categories.length && !currentCategory) {
         await setCategory(categories[0].id);
       }
-    }
-
-    async function getCategoryImages(categoryId) {
-      const { data: files, error } = await sb.storage
-        .from("category-images")
-        .list(categoryId, { limit: 200 });
-
-      if (error) {
-        console.error(error);
-        showError(error.message);
-        return [];
-      }
-
-      return (files || [])
-        .filter(f => f.name)
-        .map(f => ({
-          name: f.name,
-          path: `${categoryId}/${f.name}`,
-          publicUrl: sb.storage.from("category-images").getPublicUrl(`${categoryId}/${f.name}`).data.publicUrl
-        }));
     }
 
     async function setCategory(categoryId) {
@@ -1006,9 +1054,9 @@
             </div>
           </div>
         `;
-        card.querySelector("a").addEventListener("click", (e) => {
+        card.querySelector("a").addEventListener("click", async (e) => {
           e.preventDefault();
-          openUserProfile(user.id);
+          await openUserProfile(user.id);
         });
         usersGrid.appendChild(card);
       }
@@ -1041,16 +1089,29 @@
 
       for (const tl of tierlists || []) {
         const cat = categories.find(c => c.id === tl.category_id);
+        const isOwnTierlist = !!(session?.user && tl.user_id === session.user.id);
+
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
           <strong><a href="#">${escapeHtml(tl.name || `Tier List • ${cat?.name || ""}`)}</a></strong>
           <div class="muted">${new Date(tl.created_at).toLocaleString()}</div>
+          <div class="row" style="margin-top:10px;">
+            ${isOwnTierlist ? `<button class="danger-btn small-btn">Delete Tier List</button>` : ""}
+          </div>
         `;
-        card.querySelector("a").addEventListener("click", (e) => {
+
+        card.querySelector("a").addEventListener("click", async (e) => {
           e.preventDefault();
-          openTierlist(tl.id);
+          await openTierlist(tl.id);
         });
+
+        if (isOwnTierlist) {
+          card.querySelector("button").addEventListener("click", async () => {
+            await deleteTierlist(tl.id);
+          });
+        }
+
         userTierlistsEl.appendChild(card);
       }
 
@@ -1078,23 +1139,30 @@
 
       for (const tl of data || []) {
         const cat = categories.find(c => c.id === tl.category_id);
+
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
           <strong><a href="#">${escapeHtml(tl.name || `Tier List • ${cat?.name || ""}`)}</a></strong>
           <div class="muted">${new Date(tl.created_at).toLocaleString()}</div>
+          <div class="row" style="margin-top:10px;">
+            <button class="danger-btn small-btn">Delete Tier List</button>
+          </div>
         `;
-        card.querySelector("a").addEventListener("click", (e) => {
+
+        card.querySelector("a").addEventListener("click", async (e) => {
           e.preventDefault();
-          openTierlist(tl.id);
+          await openTierlist(tl.id);
         });
+
+        card.querySelector("button").addEventListener("click", async () => {
+          await deleteTierlist(tl.id);
+        });
+
         myTierlistsEl.appendChild(card);
       }
     }
 
-    // =========================
-    // COMMENTS
-    // =========================
     async function loadCategoryComments(categoryId) {
       const { data, error } = await sb
         .from("category_comments")
@@ -1233,9 +1301,6 @@
       }
     });
 
-    // =========================
-    // SAVE TIERLIST
-    // =========================
     saveTierBtn.addEventListener("click", async () => {
       clearError();
       setButtonLoading(saveTierBtn, true, "Saving...");
@@ -1262,7 +1327,7 @@
         }
 
         setStatus("Tier list saved");
-        showSuccess("Tier list saved to your profile.");
+        showSuccess("Tier list saved.");
         await loadMyTierlists();
       } finally {
         setButtonLoading(saveTierBtn, false);
@@ -1314,9 +1379,6 @@
       showPage("tierlistView");
     }
 
-    // =========================
-    // PROFILE
-    // =========================
     saveProfileBtn.addEventListener("click", async () => {
       clearError();
       setButtonLoading(saveProfileBtn, true, "Saving...");
@@ -1361,19 +1423,13 @@
         await refreshAuthUI();
         await loadUsers();
         showSuccess("Profile saved.");
-        setStatus("Profile saved");
       } finally {
         setButtonLoading(saveProfileBtn, false);
       }
     });
 
-    // =========================
-    // CATEGORY CREATE + IMAGE UPLOAD
-    // =========================
     newCatName.addEventListener("input", () => {
-      if (!newCatSlug.value.trim()) {
-        newCatSlug.value = slugify(newCatName.value);
-      }
+      if (!newCatSlug.value.trim()) newCatSlug.value = slugify(newCatName.value);
     });
 
     createCategoryBtn.addEventListener("click", async () => {
@@ -1411,7 +1467,6 @@
         newCatSlug.value = "";
         await loadCategories();
         showSuccess("Category created.");
-        setStatus("Category created");
       } finally {
         setButtonLoading(createCategoryBtn, false);
       }
@@ -1448,27 +1503,40 @@
       if (currentCategory?.id === categoryId) {
         await setCategory(categoryId);
       }
+
       showSuccess("Upload complete.");
-      setStatus("Upload complete");
       catImagesInput.value = "";
     });
 
-    // =========================
-    // CATEGORY MANAGEMENT
-    // =========================
-    function isCurrentUserCategoryOwner() {
-      return !!(session?.user && currentCategory && currentCategory.owner_id === session.user.id);
+    function isCategoryOwner(category) {
+      return !!(session?.user && category?.owner_id === session.user.id);
+    }
+
+    async function deleteTierlist(tierlistId) {
+      clearError();
+      const confirmed = confirm("Are you sure you want to delete this tier list?");
+      if (!confirmed) return;
+
+      const { error } = await sb.from("tierlists").delete().eq("id", tierlistId);
+
+      if (error) {
+        showError(error.message);
+        return;
+      }
+
+      showSuccess("Tier list deleted.");
+      await loadMyTierlists();
+      if (session?.user) {
+        await openUserProfile(session.user.id);
+      }
     }
 
     async function deleteCategoryImage(filePath) {
       clearError();
-
       const confirmed = confirm("Are you sure you want to delete this image?");
       if (!confirmed) return;
 
-      const { error } = await sb.storage
-        .from("category-images")
-        .remove([filePath]);
+      const { error } = await sb.storage.from("category-images").remove([filePath]);
 
       if (error) {
         showError(error.message);
@@ -1477,13 +1545,13 @@
 
       showSuccess("Image deleted.");
       if (currentCategory) {
+        await openCategoryDetails(currentCategory.id);
         await setCategory(currentCategory.id);
       }
     }
 
     async function deleteCategory(categoryId) {
       clearError();
-
       const confirmed = confirm("Are you sure you want to delete this entire category?");
       if (!confirmed) return;
 
@@ -1498,9 +1566,7 @@
 
       if (files && files.length) {
         const paths = files.map(f => `${categoryId}/${f.name}`);
-        const { error: removeError } = await sb.storage
-          .from("category-images")
-          .remove(paths);
+        const { error: removeError } = await sb.storage.from("category-images").remove(paths);
 
         if (removeError) {
           showError(removeError.message);
@@ -1508,10 +1574,7 @@
         }
       }
 
-      const { error: deleteError } = await sb
-        .from("categories")
-        .delete()
-        .eq("id", categoryId);
+      const { error: deleteError } = await sb.from("categories").delete().eq("id", categoryId);
 
       if (deleteError) {
         showError(deleteError.message);
@@ -1532,8 +1595,10 @@
       const category = categories.find(c => c.id === categoryId);
       if (!category) return;
 
+      currentCategory = category;
+
       const images = await getCategoryImages(categoryId);
-      const isOwner = !!(session?.user && category.owner_id === session.user.id);
+      const owner = isCategoryOwner(category);
 
       categoryDetailsBox.classList.remove("hidden");
       categoryDetailsBox.innerHTML = `
@@ -1545,12 +1610,12 @@
             </div>
             <div class="row">
               <button id="openCategoryForTierBtn">Make Tier List</button>
-              ${isOwner ? `<button id="deleteCategoryBtn" style="background:#7f1d1d;">Delete Category</button>` : ""}
+              ${owner ? `<button id="deleteCategoryBtn" class="danger-btn">Delete Category</button>` : ""}
             </div>
           </div>
 
           <div class="muted" style="margin:10px 0 14px;">
-            ${isOwner
+            ${owner
               ? "You own this category. You can delete images or delete the whole category."
               : "You can use this category to create a tier list."}
           </div>
@@ -1564,16 +1629,17 @@
         await setCategory(categoryId);
       });
 
-      if (isOwner) {
-        document.getElementById("deleteCategoryBtn").addEventListener("click", () => {
-          deleteCategory(categoryId);
+      if (owner) {
+        document.getElementById("deleteCategoryBtn").addEventListener("click", async () => {
+          await deleteCategory(categoryId);
         });
       }
 
-      const categoryImageManager = document.getElementById("categoryImageManager");
+      const manager = document.getElementById("categoryImageManager");
+      manager.innerHTML = "";
 
       if (!images.length) {
-        categoryImageManager.innerHTML = `<div class="muted">No uploaded images yet.</div>`;
+        manager.innerHTML = `<div class="muted">No uploaded images yet.</div>`;
         return;
       }
 
@@ -1581,24 +1647,21 @@
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
-          <img src="${image.publicUrl}" style="width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:10px; margin-bottom:10px;">
+          <img src="${image.publicUrl}" class="thumb" alt="">
           <div class="muted" style="word-break:break-word; margin-bottom:10px;">${escapeHtml(image.name)}</div>
-          ${isOwner ? `<button style="background:#7f1d1d;">Delete Image</button>` : ""}
+          ${owner ? `<button class="danger-btn">Delete Image</button>` : ""}
         `;
 
-        if (isOwner) {
-          card.querySelector("button").addEventListener("click", () => {
-            deleteCategoryImage(image.path);
+        if (owner) {
+          card.querySelector("button").addEventListener("click", async () => {
+            await deleteCategoryImage(image.path);
           });
         }
 
-        categoryImageManager.appendChild(card);
+        manager.appendChild(card);
       });
     }
 
-    // =========================
-    // NAV
-    // =========================
     document.querySelectorAll("[data-page]").forEach(btn => {
       btn.addEventListener("click", async () => {
         const key = btn.getAttribute("data-page");
@@ -1609,6 +1672,8 @@
           showPage("make");
           if (categories.length && !currentCategory) {
             await setCategory(categories[0].id);
+          } else if (currentCategory) {
+            await setCategory(currentCategory.id);
           }
         }
 
@@ -1634,9 +1699,6 @@
       });
     });
 
-    // =========================
-    // INIT
-    // =========================
     await refreshAuthUI();
     await loadCategories();
     await loadUsers();
